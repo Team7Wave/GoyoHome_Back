@@ -20,4 +20,4 @@ GoyoHome App의 Backend 코드가 저장된 Repository입니다.
 ## 2. 데이터베이스 설계
 
 ### 2.1 ERD
-![ERD 이미지](https://github.com/Team7Wave/GoyoHome_Back/tree/main/image/goyohome_erd.drawio.png)
+![ERD 이미지](./image/goyohome_erd.drawio.png)
