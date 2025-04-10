@@ -1,0 +1,65 @@
+server:
+  port: 8080
+
+spring:
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    defer-datasource-initialization: true
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/goyohome?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8&allowPublicKeyRetrieval=true
+    username: ${DB_USERNAME} # .env 파일로 보안 - application.yml 파일에서 참조, +) .env 파일에서는 '=' 연산자 앞뒤로 공백이 없어야 함.
+    password: ${DB_PASSWORD} # .env 파일로 보안 - application.yml 파일에서 참조
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+
+
+  # client-id는 깃허브에서도 private 아니고 public이라면 숨겨야 함.
+  # 배포시 .env / local.properties / Android keystore 등에 저장하고,
+  # 코드에서는 빌드 시 주입하거나 Android Studio에서 BuildConfig를 사용하는 방법이 있음.
+
+  # 개발 중일 땐 임시로 OAuth 설정 비활성화 -> 활성화 함
+  # 여기서는 .env파일에 client-id를 포함하고, .env파일을 .gitignore에 숨김으로써 보안처리함.
+  security: # 구글 클라이언트 정보 추가, 클라이언트 정보로 구글 OAuth 연동
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID} # .env 파일로 보안 - application.yml 파일에서 참조
+            #client-secret: Android용 OAuth 클라이언트는 client_secret 없이 동작함.
+            # http://localhost:8000 을 사용하지만 나중에는 배포 도메인도 사용할 수 있음(반드시 쌍따옴표로 링크 감싸주기)
+            redirect-uri: "http://localhost:8080/login/oauth2/code/google"
+              #scope:
+              #- email
+              #- profile
+
+jwt:
+  issuer: ahnsujin2022@gmail.com # JWT 이슈 발급자
+
+logging:
+  level:
+    root: INFO # 전체 로그 레벨의 기본값
+    config: WARN # config 패키지 이하 로그는 WARN 이상만 출력. (TokenAuthenticationFilter가 있는 패키지 명이 config)
+    org.springframework.security: WARN # Spring Security 관련 로그도 줄이기. (너무 많은 로그가 나오는 것을 억제)
+
+  
+  # <배포 시 보안 문제 - 3가지 중 하나로 관리>
+  # secret_key가 지금은 직접 정한 문자열이니 배포시에는 .env나 환경변수로 관리 or
+  # application-prod.yml로 별도 분리 후 git에 올리지 않기 or
+  # spring.config.import=optional:classpath:application-secret.yml 활용
+  secret-key: capstone-goyohome-app-ahnsujin-202220032 # JWT 서명용 비밀키 (직접 지정)
+  access-token-expiration: 3600000  # Access Token 유효기간: 1시간 (ms)
+  refresh-token-expiration: 604800000 # Refresh Token 유효기간: 7일 (ms)
+
+# Swagger 자동 생성을 위해 OpenAPI 기본 정보 설정
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: alpha
+    display-request-duration: true
